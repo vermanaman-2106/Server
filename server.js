@@ -5,9 +5,7 @@ const cors = require("cors");
 
 const app = express();
 
-// allow frontend requests
 app.use(cors());
-
 app.use(express.json());
 
 app.post("/send-email", async (req, res) => {
@@ -15,7 +13,9 @@ app.post("/send-email", async (req, res) => {
 
   try {
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -36,15 +36,18 @@ app.post("/send-email", async (req, res) => {
       `,
     });
 
+    console.log("Email sent successfully");
     res.status(200).json({ success: true });
+
   } catch (error) {
     console.error("Email Error:", error);
-    res.status(500).json({ success: false });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
-const PORT = 5001;
+// IMPORTANT: Render provides its own port
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

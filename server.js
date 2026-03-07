@@ -5,7 +5,12 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://frame-x-git-main-naman-s-projects-b59abe1a.vercel.app",
+    methods: ["GET", "POST"],
+  })
+);
 app.use(express.json());
 
 app.post("/send-email", async (req, res) => {

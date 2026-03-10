@@ -1,44 +1,28 @@
 require("dotenv").config();
 const express = require("express");
-const nodemailer = require("nodemailer");
 const cors = require("cors");
+const { Resend } = require("resend");
 
 const app = express();
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-/*
-Allow both:
-- Local development (React on localhost:5173)
-- Production frontend on Vercel
-*/
 app.use(cors());
-
 app.use(express.json());
 
-/* Test route */
+// test route
 app.get("/", (req, res) => {
   res.send("FrameX backend running 🚀");
 });
 
 app.post("/send-email", async (req, res) => {
-  console.log("Received request:", req.body);
-
   const { name, email, phone, message } = req.body;
 
-  try {
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+  console.log("Received request:", req.body);
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      replyTo: email,
-      to: process.env.EMAIL_USER,
+  try {
+    const response = await resend.emails.send({
+      from: "FrameX <onboarding@resend.dev>",
+      to: "framexstudio000@gmail.com",
       subject: "New FrameX Lead 🚀",
       html: `
         <h3>New Contact Form Submission</h3>
@@ -49,16 +33,22 @@ app.post("/send-email", async (req, res) => {
       `,
     });
 
-    console.log("Email sent successfully");
-    res.status(200).json({ success: true });
+    console.log("Email sent:", response);
+
+    res.status(200).json({
+      success: true,
+    });
 
   } catch (error) {
     console.error("Email Error:", error);
-    res.status(500).json({ success: false, error: error.message });
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
   }
 });
 
-/* Render provides PORT automatically */
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {

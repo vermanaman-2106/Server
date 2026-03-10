@@ -10,15 +10,7 @@ Allow both:
 - Local development (React on localhost:5173)
 - Production frontend on Vercel
 */
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://frame-x-git-main-naman-s-projects-b59abe1a.vercel.app",
-    ],
-    methods: ["GET", "POST"],
-  })
-);
+app.use(cors());
 
 app.use(express.json());
 
